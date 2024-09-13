@@ -47,7 +47,7 @@ class Logger extends Client
             'reply_to_message_id'=>$message_id,
             'reply_markup'=>$reply_markup,
         ];
-        dump(json_encode($form_params));
+        // dump(json_encode($form_params));
         return $this->post('sendMessage',[
             'form_params'=>$form_params,
         ]);

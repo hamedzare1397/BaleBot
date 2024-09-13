@@ -11,40 +11,21 @@ use function PHPUnit\Framework\callback;
 
 class Updater
 {
+    protected $logger=new Logger();
     public function __invoke()
     {
         if(!Cache::has('offset')){
             Cache::set('offset',1);
         }
-        $offset=87;
-        // $offset=Cache::get('offset',1);
+        $offset=1;
         dump('start from offset:'.$offset);
-        $logger=new Logger();
-        $content=$logger->update($offset);
-        // dump($content->getBody()->getContents());
+        $this->logger=new Logger();
+        $content=$this->logger->update($offset);
         $objects=new UpdateResponse($content);
-        // dump($content->getBody()->getContents());
-        if(!$objects->getResult()->isEmpty()){
+        if(!$objects->getResult()->isEmpty())
+        {
             foreach($objects->getResult() as $item)
-            {
-                if(!is_null($item->getMessage()))
-                {
-                    $message=$item->getMessage();
-                    $chat=$message->getChat();
-                    dump('user is typed: '.$message->getText());
-                    [$textResponseToUser,$buttons]=$this->response($message->getText());
-                }
-
-                elseif(!is_null($item->getCallbackQuery())){
-                    $message=$item->getCallbackQuery()->getMessage();
-                    $chat=$message->getChat();
-                    $data=$item->getCallbackQuery()->getData();
-                    dump('tap button: '.$data);
-                    [$textResponseToUser,$buttons]=$this->response($data);
-                }
-                dd($message,$chat);
-                $logger->sendMessage($chat->getId(),$textResponseToUser,$message->getId(),$buttons);
-            }
+                $this->itemProccess($item);
             Cache::set('offset',$item->getUpdateId());
         }
     }
@@ -82,5 +63,38 @@ class Updater
                 $buttons->toJson(),
             ];
         }
+    }
+    private function itemProccess($item)
+    {
+        if(!is_null($item->getMessage()))
+        {
+            $this->messageProccess($item);
+        }
+        elseif(!is_null($item->getCallbackQuery()))
+        {
+            $this->callbackQueryProccess($item);
+        }
+        // dd($message,$chat);
+    }
+
+    private function messageProccess($item)
+    {
+        $message=$item->getMessage();
+            $chat=$message->getChat();
+            dump('user is typed: '.$message->getText());
+            [$textResponseToUser,$buttons]=$this->response($message->getText());
+            $this->logger->sendMessage($chat->getId(),$textResponseToUser,$message->getId(),$buttons);
+
+    }
+
+    private function callbackQueryProccess($item){
+        $callbackQuery=$item->getCallbackQuery();
+            $message=$callbackQuery->getMessage();
+            $chat=$message->getChat();
+            $data=$item->getCallbackQuery()->getData();
+            dump('tap button: '.$data);
+            [$textResponseToUser,$buttons]=$this->response($data);
+            $this->logger->sendMessage($chat->getId(),$textResponseToUser,$message->getId(),$buttons);
+
     }
 }

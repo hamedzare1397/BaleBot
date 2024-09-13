@@ -11,7 +11,7 @@ use function PHPUnit\Framework\callback;
 
 class Updater
 {
-    protected $logger=new Logger();
+    protected $logger;
     public function __invoke()
     {
         if(!Cache::has('offset')){

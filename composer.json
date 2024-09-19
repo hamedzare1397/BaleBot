@@ -1,0 +1,21 @@
+{
+    "name": "hz/balebot",
+    "description": "This package for bale.ai chat application in iran",
+    "type": "metapackage",
+    "require": {
+        "laravel/framework": "11.*"
+    },
+    "license": "Apache",
+    "autoload": {
+        "psr-4": {
+            "Hz\\Balebot\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "hamed zare",
+            "email": "hamedzare2@gmail.com"
+        }
+    ],
+    "minimum-stability": "beta"
+}
